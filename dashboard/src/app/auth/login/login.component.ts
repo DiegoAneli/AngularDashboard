@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { NavbarComponent } from "../../navbar/navbar.component";
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [FormsModule]
+  imports: [FormsModule, NavbarComponent]
 })
 export class LoginComponent {
   email: string = '';
