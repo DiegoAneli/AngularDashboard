@@ -1,32 +1,42 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:4000/graphql';
+  private token: string | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
-  login(email: string, password: string): Observable<boolean> {
-    return this.http.post<any>(this.apiUrl, { query: `mutation { login(email: "${email}", password: "${password}") { token } }` })
-      .pipe(
-        map(response => {
-          localStorage.setItem('token', response.data.login.token);
-          return true;
-        }),
-        catchError(() => of(false))
-      );
+  register(username: string, email: string, password: string): Observable<any> {
+    return this.http.post<any>('/auth/register', { username, email, password });
   }
 
-  logout() {
-    localStorage.removeItem('token');
+  login(email: string, password: string): Observable<any> {
+    return this.http.post<any>('/auth/login', { email, password }).pipe(
+      tap(response => {
+        this.token = response.token;
+        localStorage.setItem('token', this.token!);
+        this.router.navigate(['/dashboard']);
+      })
+    );
   }
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
+  }
+
+  logout(): void {
+    this.token = null;
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
   }
 }

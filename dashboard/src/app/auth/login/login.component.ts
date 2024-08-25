@@ -1,20 +1,31 @@
 import { Component } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [FormsModule],  
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  standalone: true,
+  imports: [FormsModule]
 })
 export class LoginComponent {
-  title = 'Login Page';
-
-  username: string = '';
+  email: string = '';
   password: string = '';
 
-  onLogin() {
-    console.log(`Login attempted with username: ${this.username} and password: ${this.password}`);
+  constructor(private authService: AuthService, private router: Router) {}
+
+  onLogin(): void {
+    this.authService.login(this.email, this.password).subscribe({
+      next: () => {
+        // Naviga alla dashboard se il login ha successo
+        this.router.navigate(['/dashboard']);
+      },
+      error: err => {
+        alert('Login failed');
+        console.error(err);
+      }
+    });
   }
 }
